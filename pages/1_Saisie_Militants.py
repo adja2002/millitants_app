@@ -2,8 +2,10 @@ import streamlit as st
 import database
 import auth
 import pandas as pd
+import ui
 
 st.set_page_config(page_title="Saisie Militants", page_icon="📝", layout="wide")
+ui.load_css()
 auth.require_login()
 
 st.title("Ajouter un nouveau militant")

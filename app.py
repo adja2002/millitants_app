@@ -2,8 +2,10 @@ import streamlit as st
 import database
 import auth
 import os
+import ui
 
 st.set_page_config(page_title="Système Militants", page_icon="🗳️", layout="wide")
+ui.load_css()
 
 try:
     database.init_db()
@@ -17,16 +19,25 @@ if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False
 
 if not st.session_state['logged_in']:
-    st.subheader("Connexion")
-    username = st.text_input("Nom d'utilisateur")
-    password = st.text_input("Mot de passe", type="password")
+    st.write("Veuillez vous connecter pour accéder à la plateforme.")
     
-    if st.button("Se connecter"):
-        if auth.login(username, password):
-            st.success("Connexion réussie !")
-            st.rerun()
-        else:
-            st.error("Identifiants incorrects.")
+    col1, col2 = st.columns([1, 2])
+    
+    with col1:
+        if os.path.exists("images/photo_candidat.jpeg"):
+            st.image("images/photo_candidat.jpeg", use_container_width=True, caption="Notre Candidat, Notre Avenir")
+            
+    with col2:
+        with st.form("login_form"):
+            username = st.text_input("Nom d'utilisateur")
+            password = st.text_input("Mot de passe", type="password")
+            submit = st.form_submit_button("Se connecter")
+        if submit:
+            if auth.login(username, password):
+                st.success("Connexion réussie !")
+                st.rerun()
+            else:
+                st.error("Identifiants incorrects.")
 else:
     st.write(f"Connecté en tant que: **{st.session_state['username']}** ({st.session_state['role']})")
     if st.button("Se déconnecter"):

@@ -2,8 +2,10 @@ import streamlit as st
 import database
 import auth
 import pandas as pd
+import ui
 
 st.set_page_config(page_title="Gestion Sections & Cellules", page_icon="⚙️", layout="wide")
+ui.load_css()
 auth.require_admin()
 
 st.title("Gestion des Sections et Cellules")

@@ -3,8 +3,10 @@ import database
 import auth
 import pandas as pd
 import bcrypt
+import ui
 
 st.set_page_config(page_title="Gestion Utilisateurs", page_icon="👥", layout="wide")
+ui.load_css()
 auth.require_admin()
 
 st.title("Gestion des Utilisateurs")

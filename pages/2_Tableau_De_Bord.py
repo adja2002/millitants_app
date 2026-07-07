@@ -3,11 +3,21 @@ import database
 import auth
 import pandas as pd
 import plotly.express as px
+import ui
 
 st.set_page_config(page_title="Tableau de Bord", page_icon="📊", layout="wide")
+ui.load_css()
 auth.require_admin()
 
 st.title("Tableau de Bord (Administrateur)")
+
+import os
+col_logo, col_titre = st.columns([1, 4])
+with col_logo:
+    if os.path.exists("images/photo_candidat.jpeg"):
+        st.image("images/photo_candidat.jpeg", width=150)
+with col_titre:
+    st.write("Bienvenue sur l'espace d'analyse de la campagne. Vous trouverez ici un résumé en temps réel de tous les enregistrements effectués sur le terrain.")
 
 conn = database.get_connection()
 
