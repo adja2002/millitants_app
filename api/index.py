@@ -3,9 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import List, Optional
-from backend import models
-from backend import auth
-from backend.database import get_db_connection, init_db, log_action
+from . import models
+from . import auth
+from .database import get_db_connection, init_db, log_action
 from datetime import timedelta
 import os
 
@@ -26,7 +26,7 @@ app.add_middleware(
 def startup_event():
     init_db()
 
-@app.post("/token", response_model=models.Token)
+@app.post("/api/token", response_model=models.Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = auth.authenticate_user(form_data.username, form_data.password)
     if not user:
@@ -41,12 +41,12 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.get("/users/me")
+@app.get("/api/users/me")
 async def read_users_me(current_user: dict = Depends(auth.get_current_user)):
     return {"username": current_user["nom_utilisateur"], "role": current_user["role"]}
 
 # --- Sections ---
-@app.get("/sections")
+@app.get("/api/sections")
 def get_sections(current_user: dict = Depends(auth.get_current_user)):
     conn = get_db_connection()
     c = conn.cursor()
@@ -56,7 +56,7 @@ def get_sections(current_user: dict = Depends(auth.get_current_user)):
     return sections
 
 # --- Cellules ---
-@app.get("/cellules")
+@app.get("/api/cellules")
 def get_cellules(current_user: dict = Depends(auth.get_current_user)):
     conn = get_db_connection()
     c = conn.cursor()
@@ -66,7 +66,7 @@ def get_cellules(current_user: dict = Depends(auth.get_current_user)):
     return cellules
 
 # --- Militants ---
-@app.get("/militants")
+@app.get("/api/militants")
 def get_militants(current_user: dict = Depends(auth.get_current_user)):
     conn = get_db_connection()
     c = conn.cursor()
@@ -75,7 +75,7 @@ def get_militants(current_user: dict = Depends(auth.get_current_user)):
     conn.close()
     return militants
 
-@app.post("/militants", status_code=status.HTTP_201_CREATED)
+@app.post("/api/militants", status_code=status.HTTP_201_CREATED)
 def create_militant(militant: models.MilitantCreate, current_user: dict = Depends(auth.get_current_user)):
     conn = get_db_connection()
     c = conn.cursor()
@@ -109,7 +109,7 @@ def create_militant(militant: models.MilitantCreate, current_user: dict = Depend
     conn.close()
     return {"msg": "Militant created successfully"}
 
-@app.get("/stats")
+@app.get("/api/stats")
 def get_stats(current_user: dict = Depends(auth.get_current_user)):
     conn = get_db_connection()
     c = conn.cursor()
@@ -127,7 +127,4 @@ def get_stats(current_user: dict = Depends(auth.get_current_user)):
         "cellules": cellules_count
     }
 
-# Serve Frontend static files - MUST BE LAST
-frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")
-if os.path.exists(frontend_dir):
-    app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
+# Static files are handled by Vercel automatically via the public folder and vercel.json.

@@ -1,4 +1,4 @@
-const API_URL = ""; // Assuming FastAPI serves static files, API is on same origin
+const API_URL = "/api"; // Vercel rewrite route
 
 // State
 let token = localStorage.getItem('token') || null;
