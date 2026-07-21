@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Système de Gestion des Militants</title>
+    <meta name="description" content="Plateforme de gestion pour les militants.">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Notification Toast -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Login Page -->
+    <div id="login-page" class="page active">
+        <div class="login-container">
+            <div class="login-left">
+                <!-- Fallback to a gradient if image not loaded, or use an asset -->
+                <div class="brand-hero">
+                    <h1>Notre Candidat,<br>Notre Avenir</h1>
+                    <p>Rejoignez la plateforme de gestion centralisée de nos militants et sympathisants.</p>
+                </div>
+            </div>
+            <div class="login-right">
+                <div class="login-box">
+                    <h2>Connexion</h2>
+                    <p class="subtitle">Veuillez vous identifier pour accéder au système.</p>
+                    <form id="login-form">
+                        <div class="input-group">
+                            <label for="username">Nom d'utilisateur</label>
+                            <input type="text" id="username" required placeholder="Ex: admin">
+                        </div>
+                        <div class="input-group">
+                            <label for="password">Mot de passe</label>
+                            <input type="password" id="password" required placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="login-btn">Se Connecter</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboard-page" class="page">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🗳️ SGM</h2>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" data-target="view-dashboard" class="active">Tableau de bord</a></li>
+                <li><a href="#" data-target="view-saisie">Saisie Militant</a></li>
+                <li><a href="#" data-target="view-liste">Liste Militants</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <span id="current-username">Utilisateur</span>
+                    <span id="current-role" class="badge">Role</span>
+                </div>
+                <button id="logout-btn" class="btn btn-outline">Déconnexion</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <h1 id="page-title">Tableau de bord</h1>
+            </header>
+
+            <div class="content-wrapper">
+                <!-- Dashboard View -->
+                <div id="view-dashboard" class="view active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-info">
+                                <h3>Total Militants</h3>
+                                <p id="stat-militants">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🏛️</div>
+                            <div class="stat-info">
+                                <h3>Sections</h3>
+                                <p id="stat-sections">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🏢</div>
+                            <div class="stat-info">
+                                <h3>Cellules</h3>
+                                <p id="stat-cellules">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Saisie View -->
+                <div id="view-saisie" class="view">
+                    <div class="card form-card">
+                        <h2>Ajouter un nouveau militant</h2>
+                        <form id="militant-form">
+                            <div class="form-grid">
+                                <div class="input-group">
+                                    <label>Code Militant *</label>
+                                    <input type="text" id="m_code" required>
+                                </div>
+                                <div class="input-group">
+                                    <label>Nom *</label>
+                                    <input type="text" id="m_nom" required>
+                                </div>
+                                <div class="input-group">
+                                    <label>Prénom(s)</label>
+                                    <input type="text" id="m_prenoms">
+                                </div>
+                                <div class="input-group">
+                                    <label>Sexe</label>
+                                    <select id="m_sexe">
+                                        <option value="Homme">Homme</option>
+                                        <option value="Femme">Femme</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>Section *</label>
+                                    <select id="m_section" required>
+                                        <option value="">Chargement...</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>Cellule *</label>
+                                    <select id="m_cellule" required>
+                                        <option value="">Chargement...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Enregistrer le militant</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Liste View -->
+                <div id="view-liste" class="view">
+                    <div class="card">
+                        <div class="table-header">
+                            <h2>Liste des militants</h2>
+                            <button id="refresh-list-btn" class="btn btn-outline">Rafraîchir</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Nom</th>
+                                        <th>Prénoms</th>
+                                        <th>Section</th>
+                                        <th>Cellule</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="militants-tbody">
+                                    <!-- Rows populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

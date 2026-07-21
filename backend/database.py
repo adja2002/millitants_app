@@ -1,37 +1,25 @@
+import os
 import psycopg2
 import psycopg2.extras
-import bcrypt
-import streamlit as st
-import os
+from dotenv import load_dotenv
 
-def get_connection():
-    try:
-        db_url = st.secrets["DATABASE_URL"]
-    except Exception:
-        db_url = os.getenv("DATABASE_URL")
-        if not db_url:
-            st.error("DATABASE_URL n'est pas configuré. Créez un dossier `.streamlit` contenant un fichier `secrets.toml` avec votre clé.")
-            st.stop()
+load_dotenv()
 
-    conn = psycopg2.connect(db_url)
-    # Permet d'accéder aux colonnes par leur nom comme avec sqlite3.Row
-    conn.cursor_factory = psycopg2.extras.DictCursor
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+def get_db_connection():
+    if not DATABASE_URL:
+        raise Exception("DATABASE_URL is not set")
+    conn = psycopg2.connect(DATABASE_URL)
+    conn.cursor_factory = psycopg2.extras.RealDictCursor
     return conn
 
-def log_action(utilisateur, action, description):
-    conn = get_connection()
-    c = conn.cursor()
-    c.execute('''
-        INSERT INTO historique_activites (utilisateur, action, description)
-        VALUES (%s, %s, %s)
-    ''', (utilisateur, action, description))
-    conn.commit()
-    conn.close()
-
 def init_db():
-    conn = get_connection()
+    conn = get_db_connection()
     c = conn.cursor()
     
+    # We assume tables are already created from the Streamlit version, 
+    # but we can keep the create table statements just in case.
     c.execute('''
         CREATE TABLE IF NOT EXISTS utilisateurs (
             id SERIAL PRIMARY KEY,
@@ -96,18 +84,16 @@ def init_db():
             date_heure TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
-
-    # Insert default admin user if not exists
-    c.execute('SELECT * FROM utilisateurs WHERE nom_utilisateur = %s', ('admin',))
-    if not c.fetchone():
-        hashed = bcrypt.hashpw('admin123'.encode('utf-8'), bcrypt.gensalt())
-        c.execute('INSERT INTO utilisateurs (nom_utilisateur, mot_de_passe, role) VALUES (%s, %s, %s)',
-                  ('admin', hashed.decode('utf-8'), 'Administrateur'))
-
+    
     conn.commit()
     conn.close()
 
-if __name__ == '__main__':
-    # Ceci échouera si exécuté directement sans st.secrets, sauf si DATABASE_URL est en variable d'env
-    init_db()
-    print("Database initialized successfully.")
+def log_action(utilisateur: str, action: str, description: str):
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('''
+        INSERT INTO historique_activites (utilisateur, action, description)
+        VALUES (%s, %s, %s)
+    ''', (utilisateur, action, description))
+    conn.commit()
+    conn.close()
