@@ -4,8 +4,8 @@ import jwt
 from datetime import datetime, timedelta
 from fastapi import HTTPException, Security, status
 from fastapi.security import OAuth2PasswordBearer
-from .database import get_db_connection
-from .models import TokenData
+from api.database import get_db_connection
+from api.models import TokenData
 
 SECRET_KEY = os.getenv("JWT_SECRET", "une_cle_secrete_tres_complexe_a_changer")
 ALGORITHM = "HS256"

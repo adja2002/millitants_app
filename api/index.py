@@ -3,9 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import List, Optional
-from . import models
-from . import auth
-from .database import get_db_connection, init_db, log_action
+from api import models
+from api import auth
+from api.database import get_db_connection, init_db, log_action
 from datetime import timedelta
 import os
 
