@@ -3,9 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import List, Optional
-import models
-import auth
-from database import get_db_connection, init_db, log_action
+from backend import models
+from backend import auth
+from backend.database import get_db_connection, init_db, log_action
 from datetime import timedelta
 import os
 
