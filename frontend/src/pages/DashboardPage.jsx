@@ -4,6 +4,8 @@ import API from '../api/axios';
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
   const [historique, setHistorique] = useState([]);
+  const [incompleteSections, setIncompleteSections] = useState([]);
+  const [incompleteCellules, setIncompleteCellules] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -12,12 +14,20 @@ export default function DashboardPage() {
 
   const loadData = async () => {
     try {
-      const [statsRes, histRes] = await Promise.all([
+      const [statsRes, histRes, sectionsRes, cellulesRes] = await Promise.all([
         API.get('/stats/'),
         API.get('/historique/?page_size=10'),
+        API.get('/sections/'),
+        API.get('/cellules/')
       ]);
       setStats(statsRes.data);
       setHistorique(histRes.data.results || histRes.data || []);
+      
+      const incompSec = (sectionsRes.data.results || sectionsRes.data || []).filter(s => s.cellules_count < 10);
+      const incompCel = (cellulesRes.data.results || cellulesRes.data || []).filter(c => c.militants_count < 50);
+      
+      setIncompleteSections(incompSec);
+      setIncompleteCellules(incompCel);
     } catch (err) {
       console.error('Erreur chargement dashboard:', err);
     } finally {
@@ -107,6 +117,42 @@ export default function DashboardPage() {
               ))
             ) : (
               <p className="empty-state">Aucune donnée disponible</p>
+            )}
+          </div>
+        </div>
+      </div>
+      {/* Quotas Incomplets */}
+      <div className="dashboard-row">
+        <div className="card dashboard-card">
+          <h3 className="card-title">⚠️ Sections Incomplètes</h3>
+          <p className="subtitle" style={{marginBottom: '1rem', fontSize: '0.85rem', color: 'var(--text-muted)'}}>Minimum de 10 cellules requises</p>
+          <div className="top-sections-list">
+            {incompleteSections.length > 0 ? (
+              incompleteSections.slice(0, 5).map(s => (
+                <div key={s.code_section} className="top-section-item">
+                  <span className="top-name">{s.nom_section}</span>
+                  <span className="top-count badge badge-warning">{s.cellules_count} / 10 cellules</span>
+                </div>
+              ))
+            ) : (
+              <p className="empty-state">Toutes les sections ont atteint leur quota ! 🎉</p>
+            )}
+          </div>
+        </div>
+
+        <div className="card dashboard-card">
+          <h3 className="card-title">⚠️ Cellules Incomplètes</h3>
+          <p className="subtitle" style={{marginBottom: '1rem', fontSize: '0.85rem', color: 'var(--text-muted)'}}>Minimum de 50 militants requis</p>
+          <div className="top-sections-list">
+            {incompleteCellules.length > 0 ? (
+              incompleteCellules.slice(0, 5).map(c => (
+                <div key={c.code_cellule} className="top-section-item">
+                  <span className="top-name">{c.nom_cellule} ({c.section_nom})</span>
+                  <span className="top-count badge badge-warning">{c.militants_count} / 50 militants</span>
+                </div>
+              ))
+            ) : (
+              <p className="empty-state">Toutes les cellules ont atteint leur quota ! 🎉</p>
             )}
           </div>
         </div>

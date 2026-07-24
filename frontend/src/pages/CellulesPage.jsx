@@ -147,7 +147,11 @@ export default function CellulesPage() {
                     <td>{c.responsable || '—'}</td>
                     <td>{c.telephone || '—'}</td>
                     <td><span className="badge badge-section">{c.section_nom || c.section || '—'}</span></td>
-                    <td><span className="badge badge-primary">{c.militants_count}</span></td>
+                    <td>
+                      <span className={`badge ${c.militants_count >= 50 ? 'badge-success' : 'badge-warning'}`} title={c.militants_count < 50 ? 'Minimum de 50 militants non atteint' : 'Quota atteint'}>
+                        {c.militants_count} / 50
+                      </span>
+                    </td>
                     <td>
                       <div className="action-btns">
                         <button className="btn-icon btn-edit" title="Modifier" onClick={() => openEdit(c)}>✏️</button>

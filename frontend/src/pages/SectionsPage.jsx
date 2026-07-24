@@ -106,7 +106,11 @@ export default function SectionsPage() {
                     <td><strong>{s.code_section}</strong></td>
                     <td>{s.nom_section}</td>
                     <td>{s.responsable || '—'}</td>
-                    <td><span className="badge badge-info">{s.cellules_count}</span></td>
+                    <td>
+                      <span className={`badge ${s.cellules_count >= 10 ? 'badge-success' : 'badge-warning'}`} title={s.cellules_count < 10 ? 'Minimum de 10 cellules non atteint' : 'Quota atteint'}>
+                        {s.cellules_count} / 10
+                      </span>
+                    </td>
                     <td><span className="badge badge-primary">{s.militants_count}</span></td>
                     <td>
                       <div className="action-btns">
