@@ -1,7 +1,22 @@
-.streamlit/
+# Python / Django
 __pycache__/
 *.pyc
-.env
-militants.db
 venv/
 env/
+.env
+backend/.env
+backend/db.sqlite3
+
+# Node / React
+node_modules/
+dist/
+frontend/dist/
+frontend/.env
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Autres
+.DS_Store
+.idea/
+.vscode/
