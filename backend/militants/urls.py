@@ -7,6 +7,8 @@ router.register(r'sections', views.SectionViewSet)
 router.register(r'cellules', views.CelluleViewSet)
 router.register(r'militants', views.MilitantViewSet)
 router.register(r'historique', views.HistoriqueViewSet)
+router.register(r'users', views.UserViewSet, basename='user')
+
 
 urlpatterns = [
     path('users/me/', views.current_user, name='current-user'),

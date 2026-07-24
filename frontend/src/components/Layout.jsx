@@ -14,6 +14,7 @@ const pageTitles = {
   '/militants': 'Gestion des Militants',
   '/sections': 'Gestion des Sections',
   '/cellules': 'Gestion des Cellules',
+  '/users': 'Gestion des Utilisateurs',
 };
 
 export default function Layout() {
@@ -22,6 +23,11 @@ export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const pageTitle = pageTitles[location.pathname] || 'SGM';
+
+  const userNavItems = [...navItems];
+  if (user?.role === 'ADMIN') {
+    userNavItems.push({ path: '/users', label: 'Utilisateurs', icon: '🔐' });
+  }
 
   return (
     <div className="dashboard-layout">
@@ -35,7 +41,7 @@ export default function Layout() {
         </div>
 
         <nav className="nav-links">
-          {navItems.map(item => (
+          {userNavItems.map(item => (
             <NavLink
               key={item.path}
               to={item.path}

@@ -1,5 +1,8 @@
 from rest_framework import serializers
-from .models import Section, Cellule, Militant, HistoriqueActivite
+from .models import Section, Cellule, Militant, HistoriqueActivite, UserProfile
+from django.contrib.auth.models import User
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 
 
 class SectionSerializer(serializers.ModelSerializer):
@@ -88,3 +91,66 @@ class HistoriqueActiviteSerializer(serializers.ModelSerializer):
         model = HistoriqueActivite
         fields = ['id', 'utilisateur', 'action', 'description', 'date_heure']
         read_only_fields = ['date_heure']
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """Sérialiseur pour les utilisateurs et leurs rôles."""
+    role = serializers.CharField(source='profile.role', required=False)
+    password = serializers.CharField(write_only=True, required=False)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'password', 'role', 'is_active']
+    
+    def create(self, validated_data):
+        profile_data = validated_data.pop('profile', {})
+        role = profile_data.get('role', 'SAISISSEUR')
+        
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data.get('email', ''),
+            password=validated_data.get('password')
+        )
+        # Create profile automatically
+        UserProfile.objects.create(user=user, role=role)
+        return user
+
+    def update(self, instance, validated_data):
+        profile_data = validated_data.pop('profile', {})
+        
+        # Update User fields
+        instance.username = validated_data.get('username', instance.username)
+        instance.email = validated_data.get('email', instance.email)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
+        
+        if 'password' in validated_data and validated_data['password']:
+            instance.set_password(validated_data['password'])
+            
+        instance.save()
+        
+        # Update or create Profile fields
+        if profile_data:
+            role = profile_data.get('role')
+            if role:
+                profile, created = UserProfile.objects.get_or_create(user=instance)
+                profile.role = role
+                profile.save()
+                
+        return instance
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """Surcharge du JWT pour inclure le rôle."""
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Add custom claims
+        try:
+            token['role'] = user.profile.role
+        except UserProfile.DoesNotExist:
+            if user.is_superuser or user.is_staff:
+                token['role'] = 'ADMIN'
+            else:
+                token['role'] = 'SAISISSEUR'
+        return token
+

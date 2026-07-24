@@ -1,7 +1,9 @@
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, BasePermission
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
+from django.contrib.auth.models import User
 from django.db.models import Q
 
 from .models import Section, Cellule, Militant, HistoriqueActivite
@@ -10,7 +12,19 @@ from .serializers import (
     CelluleSerializer, CelluleListSerializer,
     MilitantSerializer, MilitantListSerializer,
     HistoriqueActiviteSerializer,
+    UserSerializer,
+    CustomTokenObtainPairSerializer
 )
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+class IsAdminUser(BasePermission):
+    """
+    Allows access only to admin users.
+    """
+    def has_permission(self, request, view):
+        return bool(request.user and (request.user.is_staff or getattr(request.user, 'profile', None) and request.user.profile.role == 'ADMIN'))
 
 
 def log_action(user, action, description=""):
@@ -28,6 +42,12 @@ def log_action(user, action, description=""):
 def current_user(request):
     """Retourne les informations de l'utilisateur connecté."""
     user = request.user
+    role = 'SAISISSEUR'
+    if hasattr(user, 'profile'):
+        role = user.profile.role
+    elif user.is_staff or user.is_superuser:
+        role = 'ADMIN'
+
     return Response({
         'id': user.id,
         'username': user.username,
@@ -36,7 +56,7 @@ def current_user(request):
         'last_name': user.last_name,
         'is_staff': user.is_staff,
         'is_superuser': user.is_superuser,
-        'role': 'admin' if user.is_superuser else ('staff' if user.is_staff else 'user'),
+        'role': role,
     })
 
 
@@ -207,3 +227,24 @@ class HistoriqueViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = HistoriqueActivite.objects.all()
     serializer_class = HistoriqueActiviteSerializer
     permission_classes = [IsAuthenticated]
+
+
+# --- User ViewSet ---
+class UserViewSet(viewsets.ModelViewSet):
+    """CRUD pour les utilisateurs, réservé aux Admins."""
+    queryset = User.objects.select_related('profile').all().order_by('-id')
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    pagination_class = None
+
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        log_action(self.request.user, "Création Utilisateur", f"L'utilisateur {instance.username} a été créé.")
+
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        log_action(self.request.user, "Modification Utilisateur", f"L'utilisateur {instance.username} a été modifié.")
+
+    def perform_destroy(self, instance):
+        log_action(self.request.user, "Suppression Utilisateur", f"L'utilisateur {instance.username} a été supprimé.")
+        instance.delete()

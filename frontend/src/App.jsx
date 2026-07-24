@@ -6,6 +6,7 @@ import DashboardPage from './pages/DashboardPage';
 import MilitantsPage from './pages/MilitantsPage';
 import SectionsPage from './pages/SectionsPage';
 import CellulesPage from './pages/CellulesPage';
+import UsersPage from './pages/UsersPage';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -45,6 +46,7 @@ function AppRoutes() {
         <Route path="militants" element={<MilitantsPage />} />
         <Route path="sections" element={<SectionsPage />} />
         <Route path="cellules" element={<CellulesPage />} />
+        <Route path="users" element={<UsersPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>

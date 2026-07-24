@@ -1,5 +1,7 @@
 from django.db import models
 from django.db.models import Max
+from django.contrib.auth.models import User
+
 
 
 
@@ -151,3 +153,21 @@ class HistoriqueActivite(models.Model):
 
     def __str__(self):
         return f"[{self.date_heure}] {self.utilisateur}: {self.action}"
+
+
+class UserProfile(models.Model):
+    """Profil étendu pour gérer le rôle de l'utilisateur."""
+    ROLE_CHOICES = [
+        ('ADMIN', 'Administrateur'),
+        ('SAISISSEUR', 'Saisisseur'),
+    ]
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='SAISISSEUR')
+
+    class Meta:
+        db_table = 'user_profiles'
+        verbose_name = "Profil Utilisateur"
+        verbose_name_plural = "Profils Utilisateurs"
+
+    def __str__(self):
+        return f"{self.user.username} - {self.role}"
