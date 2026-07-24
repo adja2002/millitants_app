@@ -39,12 +39,6 @@ class CelluleSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['code_cellule']
 
-    def validate_section(self, value):
-        if not self.instance: # only check on creation
-            if value.cellules.count() >= 10:
-                raise serializers.ValidationError("Cette section a atteint sa limite maximale de 10 cellules.")
-        return value
-
     def get_militants_count(self, obj):
         return obj.militants.count()
 
@@ -72,12 +66,6 @@ class MilitantSerializer(serializers.ModelSerializer):
             'responsable_recensement', 'observations'
         ]
         read_only_fields = ['code_militant']
-
-    def validate_cellule(self, value):
-        if not self.instance and value: # only check on creation and if cellule is provided
-            if value.militants.count() >= 50:
-                raise serializers.ValidationError("Cette cellule a atteint sa limite maximale de 50 militants.")
-        return value
 
 
 class MilitantListSerializer(serializers.ModelSerializer):
