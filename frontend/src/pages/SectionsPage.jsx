@@ -7,7 +7,7 @@ export default function SectionsPage() {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ code_section: '', nom_section: '', responsable: '' });
+  const [form, setForm] = useState({ nom_section: '', responsable: '' });
 
   useEffect(() => { loadSections(); }, []);
 
@@ -25,14 +25,13 @@ export default function SectionsPage() {
 
   const openAdd = () => {
     setEditing(null);
-    setForm({ code_section: '', nom_section: '', responsable: '' });
+    setForm({ nom_section: '', responsable: '' });
     setShowModal(true);
   };
 
   const openEdit = (section) => {
     setEditing(section);
     setForm({
-      code_section: section.code_section,
       nom_section: section.nom_section,
       responsable: section.responsable || '',
     });
@@ -135,10 +134,7 @@ export default function SectionsPage() {
             </div>
             <form onSubmit={handleSubmit}>
               <div className="modal-body">
-                <div className="input-group">
-                  <label>Code Section *</label>
-                  <input name="code_section" value={form.code_section} onChange={handleChange} required disabled={!!editing} />
-                </div>
+
                 <div className="input-group">
                   <label>Nom de la Section *</label>
                   <input name="nom_section" value={form.nom_section} onChange={handleChange} required />

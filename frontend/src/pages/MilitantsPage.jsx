@@ -18,7 +18,7 @@ export default function MilitantsPage() {
   const [saving, setSaving] = useState(false);
 
   const emptyForm = {
-    code_militant: '', nom: '', prenoms: '', sexe: 'Homme',
+    nom: '', prenoms: '', sexe: 'Homme',
     date_naissance: '', lieu_naissance: '', num_cni: '',
     num_carte_electeur: '', lieu_vote: '', bureau_vote: '',
     telephone_1: '', quartier: '', cellule: '', section: '',
@@ -84,7 +84,6 @@ export default function MilitantsPage() {
       const data = res.data;
       setEditingMilitant(data);
       setForm({
-        code_militant: data.code_militant || '',
         nom: data.nom || '',
         prenoms: data.prenoms || '',
         sexe: data.sexe || 'Homme',
@@ -129,7 +128,6 @@ export default function MilitantsPage() {
         if (payload[k] === '') payload[k] = null;
       });
       // Required fields must not be null
-      payload.code_militant = form.code_militant;
       payload.nom = form.nom;
 
       if (editingMilitant) {
@@ -291,10 +289,7 @@ export default function MilitantsPage() {
             <form onSubmit={handleSubmit}>
               <div className="modal-body">
                 <div className="form-grid">
-                  <div className="input-group">
-                    <label>Code Militant *</label>
-                    <input name="code_militant" value={form.code_militant} onChange={handleChange} required disabled={!!editingMilitant} />
-                  </div>
+
                   <div className="input-group">
                     <label>Nom *</label>
                     <input name="nom" value={form.nom} onChange={handleChange} required />

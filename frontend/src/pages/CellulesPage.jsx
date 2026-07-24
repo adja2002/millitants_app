@@ -10,7 +10,7 @@ export default function CellulesPage() {
   const [saving, setSaving] = useState(false);
   const [filterSection, setFilterSection] = useState('');
   const [form, setForm] = useState({
-    code_cellule: '', nom_cellule: '', quartier: '',
+    nom_cellule: '', quartier: '',
     responsable: '', telephone: '', section: ''
   });
 
@@ -46,14 +46,13 @@ export default function CellulesPage() {
 
   const openAdd = () => {
     setEditing(null);
-    setForm({ code_cellule: '', nom_cellule: '', quartier: '', responsable: '', telephone: '', section: '' });
+    setForm({ nom_cellule: '', quartier: '', responsable: '', telephone: '', section: '' });
     setShowModal(true);
   };
 
   const openEdit = (cellule) => {
     setEditing(cellule);
     setForm({
-      code_cellule: cellule.code_cellule,
       nom_cellule: cellule.nom_cellule,
       quartier: cellule.quartier || '',
       responsable: cellule.responsable || '',
@@ -176,10 +175,7 @@ export default function CellulesPage() {
             <form onSubmit={handleSubmit}>
               <div className="modal-body">
                 <div className="form-grid">
-                  <div className="input-group">
-                    <label>Code Cellule *</label>
-                    <input name="code_cellule" value={form.code_cellule} onChange={handleChange} required disabled={!!editing} />
-                  </div>
+
                   <div className="input-group">
                     <label>Nom de la Cellule *</label>
                     <input name="nom_cellule" value={form.nom_cellule} onChange={handleChange} required />
